@@ -4,6 +4,11 @@ import json
 
 app = flask.Flask(__name__)
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = 'https://api-omega-opal.vercel.app/api/quote'
+    return response
+
 @app.route("/api/quote")
 def generate_random_quote():
     quotes = [
