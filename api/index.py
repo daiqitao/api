@@ -1,18 +1,29 @@
-import random
-import flask
+from flask import Flask, make_response
 import json
+from flask_cors import CORS
+import random
+import os
+import os.path
+import flask
+from flask import send_file
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
+CORS(app)
 
-@app.after_request
-def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    return response
+@app.route("/")
+def nonepage():
+    return flask.redirect("/index.html")
+
+@app.route("/<path:page>")
+def mainpage(page):
+    if os.path.isdir(page):
+        page += "/index.html"
+    return send_file(page)
 
 @app.route("/api/quote")
 def generate_random_quote():
     quotes = [
-        "欢迎来到银河编程 Welcome to GalaxyCode",
+        "人生就像心电图，如果一帆风顺，你就挂了。",
         "山重水复疑无路，make后面不加to",
         "想致富，先撸树。",
         "要是追你那么容易，那我爱你干嘛",
@@ -163,7 +174,8 @@ def generate_random_quote():
     random_quote = random.choice(quotes)
     
     data = {"quote": random_quote}
-    return json.dumps(data)
+    response = make_response(json.dumps(data))
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
-if __name__ == "__main__":
-    app.run(port=80, debug=True)
+app.run("0.0.0.0", 80)
