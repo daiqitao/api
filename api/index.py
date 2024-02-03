@@ -19,7 +19,12 @@ def mainpage(page):
     if os.path.isdir(page):
         page += "/index.html"
     return send_file(page)
+    
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 @app.route("/api/quote")
 def generate_random_quote():
     quotes = [
@@ -170,12 +175,10 @@ def generate_random_quote():
         "小明：爸爸，你知道吗，我今天和一个小朋友打了架！, 爸爸：为什么？, 小明：他问我有啥本事，我说我可以闭上眼睛骑自行车，他就说那不算，然后我就打了他一巴掌。",
         "有一天，老师问小明：“小明，你的作业怎么没写？”, 小明回答：“老师，我忘了带家庭作业本。”, 老师说：“小明，你真是一个忘性大王！”, 小明冲出教室后喃喃自语：“忘了带作业本，还记得我是国王。”",
     ]
-
     random_quote = random.choice(quotes)
-    
-    data = {"quote": random_quote}
-    response = make_response(json.dumps(data))
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    return response
 
-app.run("0.0.0.0", 80)
+    data = {"quote": random_quote}
+    return json.dumps(data)
+
+if __name__ == "__main__":
+    app.run(port=80, debug=True)
